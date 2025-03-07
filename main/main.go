@@ -3,24 +3,27 @@ package main
 import "fmt"
 
 func main() {
-	defer handlePanic()
-
-	messages := []string{
-		"message 1",
-		"message 2",
-		"message 3",
-		"message 4",
+	// Map предстовляет собой тип данных который является словарем
+	// Работает по концепции ключ значение
+	// Ключ в map должен быть уникальным (не должен дублироваться)
+	users := map[string]int{
+		"Alex":  10,
+		"Ivan":  25,
+		"Artem": 42,
 	}
 
-	messages[4] = "message 5" // Получаем панику и выходим из main()
+	// Перезапись
+	users["Alex"] = 52
 
-	fmt.Println(messages)
-}
-
-func handlePanic() {
-	if r := recover(); r != nil {
-		fmt.Println(r)
+	// Цикл по map
+	for key, value := range users {
+		fmt.Println(key, value)
 	}
 
-	fmt.Println("handlePanic() выполнилась успешно")
+	// Удаление элемента map
+	delete(users, "Ivan")
+
+	// Если у нас не инициализировнна map, то мы в неё не можем писать
+	var users1 map[string]int
+	users1["Vova"] = 15
 }
