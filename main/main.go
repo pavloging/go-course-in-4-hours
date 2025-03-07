@@ -3,24 +3,24 @@ package main
 import "fmt"
 
 func main() {
-	// messages := []string{
-	// 	"message 1",
-	// 	"message 2",
-	// 	"message 3",
-	// 	"message 4",
-	// }
+	defer handlePanic()
 
-	// for i, message := range messages { // Аналог for i := 0; i < len(messages); i++
-	// 	fmt.Println(messages[i])
-	// 	fmt.Println(message) // Аналог fmt.Println(messages[i])
-	// }
-
-	counter := 0
-	for {
-		if counter == 100 {
-			break // Оператор break полностью выходит из цикла
-		}
-		counter++
-		fmt.Println(counter)
+	messages := []string{
+		"message 1",
+		"message 2",
+		"message 3",
+		"message 4",
 	}
+
+	messages[4] = "message 5" // Получаем панику и выходим из main()
+
+	fmt.Println(messages)
+}
+
+func handlePanic() {
+	if r := recover(); r != nil {
+		fmt.Println(r)
+	}
+
+	fmt.Println("handlePanic() выполнилась успешно")
 }
