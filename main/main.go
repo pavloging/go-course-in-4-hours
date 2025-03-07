@@ -3,12 +3,24 @@ package main
 import "fmt"
 
 func main() {
-	messages := make([]string, 5) // len=5, cap=5
-	messages = append(messages, "6")
+	// messages := []string{
+	// 	"message 1",
+	// 	"message 2",
+	// 	"message 3",
+	// 	"message 4",
+	// }
 
-	fmt.Println(len(messages))
-	fmt.Println(cap(messages))
+	// for i, message := range messages { // Аналог for i := 0; i < len(messages); i++
+	// 	fmt.Println(messages[i])
+	// 	fmt.Println(message) // Аналог fmt.Println(messages[i])
+	// }
 
-	fmt.Println(messages)
-
+	counter := 0
+	for {
+		if counter == 100 {
+			break // Оператор break полностью выходит из цикла
+		}
+		counter++
+		fmt.Println(counter)
+	}
 }
