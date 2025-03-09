@@ -688,12 +688,13 @@ fmt.Println(users["Vova"]) // Вывод: 0
 age, exists := users["Ivan"]
 fmt.Println(age, exists) // Вывод: 25 true
 ```
+
 ### Итерация по map
 
 Вы можете проходить по элементам map так же, как и по срезам, используя цикл for:
 
 for key, value := range users {
-    fmt.Println(key, value)
+fmt.Println(key, value)
 }
 
 ### Перезапись значения
@@ -716,13 +717,15 @@ delete(users, "Alex") // Удаляет значение по ключу "Alex"
 
 Если вы хотите использовать map, вам нужно ее инициализировать с помощью функции make. Если вы просто объявите переменную, она будет равна nil, и это приведет к ошибке:
 
-- Без make (это вызовет панику):
+-   Без make (это вызовет панику):
+
 ```go
 var users map[string]int // users == nil
 // users["Alice"] = 1 // Это вызовет панику!
 ```
 
-- С make (это работает корректно):
+-   С make (это работает корректно):
+
 ```go
 users := make(map[string]int) // Теперь users готова к использованию
 users["Alice"] = 1 // Теперь это работает
@@ -825,17 +828,18 @@ type DumbDatabase struct {
 
 func NewDumbDatabase() *DumbDatabase {
     return &DumbDatabase{m: make(map[string]string)}
-} 
+}
 ```
 
 ### Методы в структре
 
 В структурах можно определять методы. Методы могут быть двух типов:
 
-- Value receivers (Значение): работают с копией объекта.
-- Pointer receivers (Ссылка): работают с оригинальным объектом.
+-   Value receivers (Значение): работают с копией объекта.
+-   Pointer receivers (Ссылка): работают с оригинальным объектом.
 
 Пример с Value receivers:
+
 ```go
 
 package main
@@ -855,7 +859,7 @@ func (u User) printUserInfo() {
 	u.name = "Новое имя" // Значение name не будет изменено, так как этот метод (Value receivers) работает по значению, а не по ссылке
 	fmt.Println(u.name, u.sex, u.sex, u.weight, u.height)
 }
- 
+
 func NewUser(name, sex string, age, weight, height int) User {
 	return User{
 		name:   name,
@@ -899,7 +903,7 @@ func (u User) printUserInfo() {
 	u.name = "Новое имя" // Значение name будет изменено, так как этот метод (Pointer receivers) работает по ссылке
 	fmt.Println(u.name, u.sex, u.sex, u.weight, u.height)
 }
- 
+
 func NewUser(name, sex string, age, weight, height int) User {
 	return User{
 		name:   name,
@@ -974,6 +978,7 @@ func main() {
 В этом примере метод setName использует Pointer receiver, что позволяет изменять имя пользователя user1. Метод getName, использует Value receiver и возвращает текущее имя без изменения оригинального объекта.
 
 ### Создание нового типа данных для использования методов
+
 ```go
 type Age int
 
@@ -1006,7 +1011,7 @@ type User struct {
 	weight int
 	height int
 }
- 
+
 // Конструктор для создания нового пользователя
 func NewUser(name, sex string, age, weight, height int) User {
 	return User{
@@ -1025,5 +1030,193 @@ func main() {
 ```
 
 Автор упомянул:
-- Структуры в Go не являются классами в традиционном смысле объектно-ориентированного программирования (ООП), как это реализовано в языках, таких как Java или C++.
-- Структуры бывают двух типов: Pointer receivers и Value receivers
+
+-   Структуры в Go не являются классами в традиционном смысле объектно-ориентированного программирования (ООП), как это реализовано в языках, таких как Java или C++.
+-   Структуры бывают двух типов: Pointer receivers и Value receivers
+
+## Интерфейсы
+
+Интерфейс в Go — это тип, который определяет набор методов, которые должны быть реализованы другими типами. Интерфейсы позволяют создавать абстракции и обеспечивают гибкость в работе с различными типами.
+
+### Чем интерфейс отличается от структуры?
+
+1. Содержимое:
+
+    - Структура: Содержит поля (данные) и может иметь методы для работы с этими данными.
+    - Интерфейс: Содержит только методы и не имеет полей. Он описывает поведение, которое должны реализовать другие типы.
+
+2. Назначение:
+
+    - Структура: Используется для создания объектов с конкретным состоянием (например, информация о человеке).
+    - Интерфейс: Определяет набор методов, которые различные типы могут реализовать, позволяя работать с ними через общий интерфейс.
+
+3. Имплементация:
+    - Структура: Является конкретным типом с заданными данными.
+    - Интерфейс: Не требует явной реализации. Если тип реализует все методы интерфейса, он автоматически считается его реализацией.
+
+Таким образом, структура фокусируется на данных, а интерфейс — на поведении.
+
+```go
+package main
+
+import (
+	"fmt"
+	"math"
+)
+
+// Определяем интерфейс Shape, который требует реализации метода Area()
+type Shape interface {
+  Area() float32
+}
+
+// Определяем структуру Square, представляющую квадрат
+type Square struct {
+  sideLength float32
+}
+
+// Реализуем метод Area() для структуры Square
+func (s Square) Area() float32 {
+  return s.sideLength * s.sideLength
+}
+
+// Определяем структуру Circle, представляющую круг
+type Circle struct {
+  radius float32
+}
+
+// Реализуем метод Area() для структуры Circle
+func (c Circle) Area() float32 {
+  return c.radius * c.radius * math.Pi
+}
+
+
+func main() {
+    // Создаем экземпляры Square и Circle
+	square := Square{5}
+	circle := Circle{8}
+
+	printShapeArea(square)
+	printShapeArea(circle)
+
+	// Ошибки не будет в строчках ниже, так как все Имплеменирует пустой интерфейс
+	printInterface(square)
+	printInterface(circle)
+	printInterface("qwerty")
+	printInterface(123)
+	printInterface(false)
+}
+
+func printShapeArea(shape Shape) {
+	fmt.Println(shape.Area())
+}
+
+// Функция для работы с пустым интерфейсом
+func printInterface(i interface{}) {
+  // TypeSwitch позволяет определить тип переменной интерфейса
+  switch value := i.(type) {
+  case int:
+    fmt.Println("int", value) // Если i - целое число
+  case bool:
+    fmt.Println("bool", value) // Если i - булевое значение
+  default:
+    fmt.Println("unknown type", value) // Если i - не число и не булевое
+  }
+  fmt.Println(i)
+}
+
+```
+
+### Приведение типов (работа с конкретным типом)
+
+```go
+func main() {
+	printInterface("qwerty") // 6
+	printInterface(123) // "interface is not string"
+}
+
+func printInterface(i interface{}) {
+    str, ok := i.(string) // Пробуем привести i к типу string
+    if !ok {
+        fmt.Println("interface is not string") // Если не строка, выводим сообщение
+        return
+    }
+    fmt.Println(len(str)) // Если ok, печатаем длину строки
+}
+```
+
+### Композиция интерфейса
+
+```go
+package main
+
+import (
+	"fmt"
+	"math"
+)
+
+// Определяем интерфейс Shape, который включает в себя два других интерфейса
+type Shape interface {
+	ShapeWithArea
+	ShapeWithPerimeter
+}
+// Интерфейс для вычисления площади
+type ShapeWithArea interface {
+  Area() float32
+}
+
+// Интерфейс для вычисления периметра
+type ShapeWithPerimeter interface {
+  Perimeter() float32
+}
+
+// Определяем структуру Square, представляющую квадрат
+type Square struct {
+  sideLength float32
+}
+
+// Реализуем метод Area() для структуры Square
+func (s Square) Area() float32 {
+  return s.sideLength * s.sideLength
+}
+
+// Реализуем метод Perimeter() для структуры Square
+func (s Square) Perimeter() float32 {
+  return s.sideLength * 4
+}
+
+// Определяем структуру Circle, представляющую круг
+type Circle struct {
+  radius float32
+}
+
+// Реализуем метод Area() для структуры Circle
+func (c Circle) Area() float32 {
+  return c.radius * c.radius * math.Pi
+}
+
+// Реализуем метод Perimeter() для структуры Circle
+func (c Circle) Perimeter() float32 {
+  return 2 * c.radius * math.Pi
+}
+
+func main() {
+	square := Square{5}
+	circle := Circle{8}
+
+	printShapeArea(square)
+    // Ошибка, так как Circle не реализует метод Perimeter()
+    // printShapeArea(circle) // Закомментировано, так как Circle не соответствует интерфейсу Shape
+}
+
+func printShapeArea(shape Shape) {
+	fmt.Println(shape.Area())
+	fmt.Println(shape.Perimeter())
+}
+
+```
+
+Автор упомянул:
+
+- Интерфейсы позволяют создавать гибкие и расширяемые системы, где различные типы могут реализовывать общий набор методов. Мы также изучили, как интерфейсы могут быть скомпонованы для создания более сложных абстракций.
+- В Go тип автоматически считается реализацией интерфейса, если он реализует все его методы. Это позволяет использовать подход "утиной типизации": если что-то ведет себя как утка, то это, вероятно, и есть утка.
+- Использование интерфейсов и композиции интерфейсов позволяет создавать более чистый и поддерживаемый код, что является важным аспектом разработки на Go.

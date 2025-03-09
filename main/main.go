@@ -1,33 +1,53 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"math"
+)
 
-type Age int
-// С помощью чего можно прикреплять к ним методы
-func (a Age) isAdult() bool {
-    return a >= 18
+type Shape interface {
+	ShapeWithArea
+	ShapeWithPerimeter
 }
 
-type User struct {
-	name   string
-	age    Age
-	sex    string
-	weight int
-	height int
+type ShapeWithArea interface {
+	Area() float32
 }
- 
-func NewUser(name, sex string, age, weight, height int) User {
-	return User{
-		name:   name,
-		sex:    sex,
-		age:    Age(age), // Используем приведение типа
-		weight: weight,
-		height: height,
-	}
+
+type ShapeWithPerimeter interface {
+	Perimeter() float32
+}
+
+type Square struct {
+	sideLenght float32
+}
+
+func (s Square) Area() float32 {
+	return s.sideLenght * s.sideLenght
+}
+
+func (s Square) Perimeter() float32 {
+	return s.sideLenght * 4
+}
+
+type Circle struct {
+	radius float32
+}
+
+func (c Circle) Area() float32 {
+	return c.radius * c.radius * math.Pi
 }
 
 func main() {
-	user1 := NewUser("Vova", "Male", 11, 75, 188)
+	square := Square{5}
+	// circle := Circle{8}
 
-    fmt.Println(user1.age.isAdult())
+	printShapeArea(square)
+	// printShapeArea(circle) Ошибка, так как ...
+
+}
+
+func printShapeArea(shape Shape) {
+	fmt.Println(shape.Area())
+	fmt.Println(shape.Perimeter())
 }
