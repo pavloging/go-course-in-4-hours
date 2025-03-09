@@ -737,10 +737,13 @@ fmt.Println(len(users)) // Вывод: 2
 
 ## Структуры
 
-Структура в Go — это пользовательский тип данных, который позволяет хранить в себе данные в формате ключ значение и так же испрользовать и применять методы внутри структуры.
-На основании структуры можно создать множество объектов и переиспользовать их.
+Структура в Go — это пользовательский тип данных, который позволяет хранить данные в формате "ключ-значение" и методы. С помощью структур вы можете группировать связанные данные и добавлять методы для работы с ними. Это позволяет создавать множество объектов на основе одной структуры и переиспользовать их в коде.
 
-### Не переиспользуемая структура:
+В кратце, структуры нужны для создания кастомных типов, которые можно переиспользовать.
+
+### Не переиспользуемая структура
+
+Пример создания структуры без возможности повторного использования:
 
 ```go
 user := struct {
@@ -754,7 +757,9 @@ user := struct {
 	fmt.Printf("%+v", user)
 ```
 
-### Переиспользуемая структура:
+### Переиспользуемая структура
+
+Пример создания структуры, которую можно использовать многократно:
 
 ```go
 type User struct {
@@ -780,7 +785,7 @@ func main() {
 
 ## Конструктор
 
-Конструктор - это функция, которая инициализирует объект определенного типа.
+Конструктор — это функция, которая создает и инициализирует объект определенного типа. Это помогает упростить создание объектов и сделать код более читаемым.
 
 ```go
 type User struct {
@@ -791,7 +796,7 @@ type User struct {
 	height int
 }
 
-// Хорошей практикой называть конструктор со слова new
+// Хорошей практикой является называть конструктор с префиксом "New"
 func NewUser(name, sex string, age, weight, height int) User {
 	return User{
 		name:   name,
@@ -803,10 +808,222 @@ func NewUser(name, sex string, age, weight, height int) User {
 }
 
 func main() {
-	user1 := NewUser("Vova", "Male", 23, 75, 188) // Инициализируем переменную с помощью конструктора
+	user1 := NewUser("Vova", "Male", 23, 75, 188) // Инициализация переменной с помощью конструктора
 	fmt.Printf("%+v", user1)
 }
 
 ```
 
-Структуры в Go не являются классами в традиционном смысле объектно-ориентированного программирования (ООП), как это реализовано в языках, таких как Java или C++. Однако они имеют некоторые схожие черты и могут использоваться для достижения похожих целей.
+### Пример конструктора с указателем
+
+Иногда полезно возвращать указатель на объект, чтобы избежать копирования больших структур:
+
+```go
+type DumbDatabase struct {
+	m map[string]string
+}
+
+func NewDumbDatabase() *DumbDatabase {
+    return &DumbDatabase{m: make(map[string]string)}
+} 
+```
+
+### Методы в структре
+
+В структурах можно определять методы. Методы могут быть двух типов:
+
+- Value receivers (Значение): работают с копией объекта.
+- Pointer receivers (Ссылка): работают с оригинальным объектом.
+
+Пример с Value receivers:
+```go
+
+package main
+
+import "fmt"
+
+type User struct {
+	name   string
+	age    int
+	sex    string
+	weight int
+	height int
+}
+
+// Данный метод работает по значению (с копией объекта)
+func (u User) printUserInfo() {
+	u.name = "Новое имя" // Значение name не будет изменено, так как этот метод (Value receivers) работает по значению, а не по ссылке
+	fmt.Println(u.name, u.sex, u.sex, u.weight, u.height)
+}
+ 
+func NewUser(name, sex string, age, weight, height int) User {
+	return User{
+		name:   name,
+		sex:    sex,
+		age:    age,
+		weight: weight,
+		height: height,
+	}
+}
+
+func main() {
+	user1 := NewUser("Vova", "Male", 23, 75, 188)
+	user2 := User{"Petya", 27, "Male", 81, 198}
+
+	user1.printUserInfo()
+	user2.printUserInfo()
+
+	fmt.Println(user1) // Значение name будет старое - Vova
+}
+
+```
+
+Пример с Pointer receivers:
+
+```go
+
+package main
+
+import "fmt"
+
+type User struct {
+	name   string
+	age    int
+	sex    string
+	weight int
+	height int
+}
+
+// Метод работает по ссылке (с оригинальным объектом)
+func (u User) printUserInfo() {
+	u.name = "Новое имя" // Значение name будет изменено, так как этот метод (Pointer receivers) работает по ссылке
+	fmt.Println(u.name, u.sex, u.sex, u.weight, u.height)
+}
+ 
+func NewUser(name, sex string, age, weight, height int) User {
+	return User{
+		name:   name,
+		sex:    sex,
+		age:    age,
+		weight: weight,
+		height: height,
+	}
+}
+
+func main() {
+	user1 := NewUser("Vova", "Male", 23, 75, 188)
+	user2 := User{"Petya", 27, "Male", 81, 198}
+
+	user1.printUserInfo()
+	user2.printUserInfo()
+
+	fmt.Println(user1) // Значение name новое - "Новое имя"
+}
+
+```
+
+### Дополнительный пример с Value receivers и Pointer receivers
+
+```go
+
+package main
+
+import "fmt"
+
+type User struct {
+	name   string
+	age    int
+	sex    string
+	weight int
+	height int
+}
+
+// Метод с Pointer receiver - изменяет оригинальный объект
+func (u *User) setName(name string) {
+    u.name = name
+}
+
+// Метод с Value receiver - не изменяет оригинальный объект
+func (u User) getName() string {
+	return u.name
+}
+
+// Конструктор для создания нового пользователя
+func NewUser(name, sex string, age, weight, height int) User {
+	return User{
+		name:   name,
+		sex:    sex,
+		age:    age,
+		weight: weight,
+		height: height,
+	}
+}
+
+func main() {
+	user1 := NewUser("Vova", "Male", 23, 75, 188)
+	user2 := User{"Petya", 27, "Male", 81, 198}
+
+    // Изменяем имя пользователя user1
+    user1.setName("Serega")
+	fmt.Println(user1.getName()) // Вывод: Serega
+	fmt.Println(user2.getName()) // Вывод: Petya
+
+}
+```
+
+В этом примере метод setName использует Pointer receiver, что позволяет изменять имя пользователя user1. Метод getName, использует Value receiver и возвращает текущее имя без изменения оригинального объекта.
+
+### Создание нового типа данных для использования методов
+```go
+type Age int
+
+// Метод для проверки, является ли возраст взрослым
+func (a Age) isAdult bool {
+    return a >= 18
+}
+```
+
+### Приведение типов
+
+В Go можно использовать приведение типов, чтобы преобразовать значения между различными типами. Например, мы можем создать структуру User, которая будет использовать тип Age:
+
+```go
+package main
+
+import "fmt"
+
+type Age int // Создаем новый тип Age
+
+// Метод для проверки, является ли возраст взрослым
+func (a Age) isAdult() bool {
+    return a >= 18
+}
+
+type User struct {
+	name   string
+	age    Age
+	sex    string
+	weight int
+	height int
+}
+ 
+// Конструктор для создания нового пользователя
+func NewUser(name, sex string, age, weight, height int) User {
+	return User{
+		name:   name,
+		sex:    sex,
+		age:    Age(age), // Используем приведение типа
+		weight: weight,
+		height: height,
+	}
+}
+
+func main() {
+	user1 := NewUser("Vova", "Male", 11, 75, 188)
+    fmt.Println(user1.age.isAdult())
+}
+```
+
+Автор упомянул:
+- Структуры в Go не являются классами в традиционном смысле объектно-ориентированного программирования (ООП), как это реализовано в языках, таких как Java или C++.
+- Структуры бывают двух типов: Pointer receivers и Value receivers
