@@ -737,4 +737,76 @@ fmt.Println(len(users)) // Вывод: 2
 
 ## Структуры
 
-...
+Структура в Go — это пользовательский тип данных, который позволяет хранить в себе данные в формате ключ значение и так же испрользовать и применять методы внутри структуры.
+На основании структуры можно создать множество объектов и переиспользовать их.
+
+### Не переиспользуемая структура:
+
+```go
+user := struct {
+	name   string
+	age    int
+	sex    string
+	weight int
+	height int
+}{"Vova", 23, "Male", 75, 188}
+
+	fmt.Printf("%+v", user)
+```
+
+### Переиспользуемая структура:
+
+```go
+type User struct {
+	name   string
+	age    int
+	sex    string
+	weight int
+	height int
+}
+
+func main() {
+	user1 := User{"Vova", 23, "Male", 75, 188}
+	user2 := User{"Petya", 27, "Male", 81, 198}
+
+    // Получение значения струкутры
+    fmt.Println(user1.name, user1.age)
+	fmt.Println(user2.name)
+
+	fmt.Printf("%+v", user1)
+	fmt.Printf("%+v", user2)
+}
+```
+
+## Конструктор
+
+Конструктор - это функция, которая инициализирует объект определенного типа.
+
+```go
+type User struct {
+	name   string
+	age    int
+	sex    string
+	weight int
+	height int
+}
+
+// Хорошей практикой называть конструктор со слова new
+func NewUser(name, sex string, age, weight, height int) User {
+	return User{
+		name:   name,
+		sex:    sex,
+		age:    age,
+		weight: weight,
+		height: height,
+	}
+}
+
+func main() {
+	user1 := NewUser("Vova", "Male", 23, 75, 188) // Инициализируем переменную с помощью конструктора
+	fmt.Printf("%+v", user1)
+}
+
+```
+
+Структуры в Go не являются классами в традиционном смысле объектно-ориентированного программирования (ООП), как это реализовано в языках, таких как Java или C++. Однако они имеют некоторые схожие черты и могут использоваться для достижения похожих целей.
